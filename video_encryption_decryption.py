@@ -6,17 +6,96 @@ import tkinter
 from tkinter import *
 import tkinter as tk
 import tkinter.messagebox as mbox
+from tkinter import messagebox
 from tkinter import ttk
 from tkinter import filedialog
-from pil import ImageTk, Image
+from PIL import ImageTk, Image
 import cv2
 import numpy as np
 import random
 import os
+import ast
 from cv2 import *
-from moviepy.editor import *
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from formating import frame_to_text, btext_to_frame, save_pretty, playVideo
+from encryption import RSA_Hybrid_Encryptor
 
+rsa_encryptor = RSA_Hybrid_Encryptor()
+private_key_file = "rsa_private_key.pem"
+public_key_file = "rsa_public_key.pem"
 
+# Generate and write keys if not already created
+if not (os.path.exists(private_key_file) and os.path.exists(public_key_file)):
+    private_key, public_key = rsa_encryptor.key_create()
+    rsa_encryptor.key_write(private_key, private_key_file)
+    rsa_encryptor.key_write(public_key, public_key_file)
+else:
+    private_key = rsa_encryptor.key_load(private_key_file)
+    public_key = rsa_encryptor.key_load(public_key_file)
+# key = b"1234567812345678"
+nonce = b"1234"
+
+def show_popup(aesKeyEncrypted):
+    # Create a Toplevel window
+    popup = tk.Toplevel()
+    popup.title("Key Encrypted")
+    popup.geometry("300x150")  # Set window size
+
+    # Add instructions label
+    # label = tk.Label(popup, text="Click the message below to copy it:")
+    # label.pack(pady=10)
+
+    # Add a text widget for the message
+    message = tk.Text(popup, height=3, wrap="word")
+    message.insert("1.0", aesKeyEncrypted)
+    message.configure(state="disabled")  # Make it read-only
+    message.pack(pady=5, padx=10)
+
+    # Add a button to close the popup
+    close_button = tk.Button(popup, text="Close", command=popup.destroy)
+    close_button.pack(pady=5)
+
+    # Bind the click event to copy the text
+    def copy_to_clipboard(event):
+        popup.clipboard_clear()
+        popup.clipboard_append(message.get("1.0", "end-1c"))
+        popup.update()  # Required to update clipboard
+        tk.Label(popup, text="Message copied!", fg="green").pack(pady=5)
+
+    message.bind("<Button-1>", copy_to_clipboard)
+
+def get_user_input():
+    def on_submit():
+        nonlocal user_input
+        user_input = entry.get()  # Get the input from the entry widget
+        popup.destroy()  # Close the popup
+
+    user_input = None  # Placeholder for the user input
+
+    # Create a popup window
+    popup = tk.Toplevel()
+    popup.title("Input Dialog")
+    popup.geometry("300x150")
+
+    # Add a label to instruct the user
+    label = tk.Label(popup, text="Please enter your input:")
+    label.pack(pady=10)
+
+    # Add an entry widget for input
+    entry = tk.Entry(popup, width=30)
+    entry.pack(pady=10)
+    entry.focus()  # Focus on the entry box
+
+    # Add a submit button
+    submit_button = tk.Button(popup, text="Submit", command=on_submit)
+    submit_button.pack(pady=10)
+
+    # Wait for the popup to close before returning
+    popup.grab_set()  # Make the popup modal (block interaction with other windows)
+    popup.wait_window()  # Pause execution until the popup is closed
+
+    return user_input    
 # Main Window & Configuration
 window = tk.Tk() # created a tkinter gui window frame
 window.title("Video Encryption Decryption") # title given is "DICTIONARY"
@@ -68,104 +147,123 @@ def open_file():
 # function to encrypt video and show encrypted video
 def encrypt_fun():
     global filename
-    path_list = []
-
-    # converting videos to images --------------------------------
-    # Read the video from specified path
+    cipherFrames = []
+    originalFrames = []
+    encryptedKey, key = rsa_encryptor.aes_key_generate(public_key)
     cam = cv2.VideoCapture(filename)
-    # print(cam.get(cv2.CAP_PROP_FPS))
-    # info1.config(text="Frame Rate  :  " + str(cam.get(cv2.CAP_PROP_FPS)))
-    x = int(cam.get(cv2.CAP_PROP_FPS))
-    try:
-        # creating a folder named data
-        if not os.path.exists('Video Images'):
-            os.makedirs('Video Images')
-    # if not created then raise error
-    except OSError:
-        print('Error: Creating directory of data')
-    # frame
-    currentframe = 0
-    x2 = 0
-    while (True):
-        # reading from frame
+    frame_count = 0
+    fps = cam.get(cv2.CAP_PROP_FPS)
+
+    width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    
+    while True:
+        # Read the next frame
         ret, frame = cam.read()
-        if ret:
-            if currentframe % x == 0:
-                # if video is still left continue creating images
-                x1 = int(currentframe / x)
-                name = './Video Images/frame' + str(x1) + '.jpg'
-                # print(x1, end = " ")
-                x2 = x2 + 1
-                #         print ('Creating...' + name)
-                # writing the extracted images
-                cv2.imwrite(name, frame)
-
-                # ------------- convert to encrypted image -----------------
-                # name_of = './Video Images/frame' + str(x1) + '.jpg'
-                image_input = imread(name, IMREAD_GRAYSCALE)
-                (x3, y) = image_input.shape
-                image_input = image_input.astype(float) / 255.0
-                # print(image_input)
-
-                mu, sigma = 0, 0.1  # mean and standard deviation
-                key = np.random.normal(mu, sigma, (x3, y)) + np.finfo(float).eps
-                # print(key)
-                image_encrypted = image_input / key
-                name1 = './Video Images/frame' + str(x1) + '.jpg'
-                # path_list.append(name1)
-                # print(x1)
-                imwrite(name1, image_encrypted * 255)
-                # ----------------------------------------------------------
-
-            # increasing counter so that it will
-            # show how many frames are created
-            currentframe += 1
-        else:
+        
+        # If no frame is returned (end of video), break the loop
+        if not ret:
             break
-    #     ret,frame = cam.read()
-    # info2.config(text="No. of frame/Images  :  " + str(x2))
-    # Release all space and windows once done
+        if frame_count < 90:
+            # Encrypting the frame
+            # print(f"initited {frame_count}")
+            frame_text = frame_to_text(frame)
+            cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
+            ciphertext, tag = cipher.encrypt_and_digest(frame_text)
+            encryptedframe = btext_to_frame(width, height, ciphertext)
+            cipherFrames.append(encryptedframe)
+            # cipherFrames.append(btext_to_frame(width, height, frame_text))
+            # cv2.imshow('Encrypted Video Play', encryptedframe)    
+        else:    
+            originalFrames.append(frame)
+            # cv2.imshow('Video Player', frame)    
+        frame_count += 1
+
+    print("encrypting frames done in memory \nrendering encrpyted video")     
+
     cam.release()
     cv2.destroyAllWindows()
+    output_video_path = "output/encrypted_video.avi"
 
-    # print(len(path_list))
-    # for i in path_list:
-    #     print(i)
-    ic_list = []
-    for i in range(x2):
-        ic_list.append(ImageClip("Images/sample.jpg").set_duration(1))
-    video = concatenate(ic_list, method="compose")
-    video.write_videofile('slide_show.mp4', fps=24)
+    # Define the codec and create a VideoWriter object
+    fourcc = cv2.VideoWriter_fourcc(*'FFV1')   # Codec (use 'XVID', 'mp4v', 'MJPG', etc.)
+    frame_size = (width, height)  # Frame size (width, height) - should match frame size of RGB frames
+    # print(frame_size)
+    out = cv2.VideoWriter(output_video_path, fourcc, fps, frame_size)
 
-    # playing encrypted video ------------
-    source1 = cv2.VideoCapture('slide_show.mp4')
-    # running the loop
-    while True:
-        # extracting the frames
-        ret1, img1 = source1.read()
-        # displaying the video
-        cv2.imshow("Encrypted Video", img1)
-        # exiting the loop
-        key = cv2.waitKey(1)
-        if key == ord("q"):
-            break
+    # Loop through each frame in the array and write it to the video
+    # print(cipherFrames[0])
+    for frame in np.array(cipherFrames):
+        out.write(frame)  # Write each frame
 
+    for frame in np.array(originalFrames):
+        out.write(frame)    
+
+    # Release the VideoWriter object
+    out.release()
+    print("Done encrypting")
+    # exit()
+    show_popup(encryptedKey)
+    playVideo("output/encrypted_video.avi")
+
+    
 # function to decrypt video and show decrypted video
 def decrypt_fun():
     global filename
-    source = cv2.VideoCapture(filename)
-    # running the loop
+    frame_count = 0
+    cam = cv2.VideoCapture(filename)
+    frame_count = 0
+    fps = cam.get(cv2.CAP_PROP_FPS)
+    encryptedKey = get_user_input()
+    key = rsa_encryptor.Decrypt_aes_key(private_key, encryptedKey)
+    videoFrames = []
+    print("frames saved")
+    width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    
     while True:
-        # extracting the frames
-        ret, img = source.read()
-        # converting to gray-scale
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # displaying the video
-        cv2.imshow("Decrypted Video", gray)
-        # exiting the loop
-        key = cv2.waitKey(1)
-        if key == ord("q"):
+        # print(f"initited {frame_count}")
+        ret, frame = cam.read()
+        
+        if not ret:
             break
+        if frame_count < 90:
+            # Decrypting the frame
+            cipherr = AES.new(key, AES.MODE_EAX, nonce=nonce)
+            frame_text = frame_to_text(frame)
+            plaintext = cipherr.decrypt(frame_text)
+            decryptedframe = btext_to_frame(width, height, plaintext)
+            videoFrames.append(decryptedframe)
+            # cv2.imshow('Decrypted Video', decryptedframe)    
+        else:    
+            videoFrames.append(frame)
+            # cv2.imshow('Decrypted Video', frame)    
+
+        frame_count += 1
+
+    print("decrypting frames done in memory \nrendering decrpyted video")     
+
+    cam.release()
+    cv2.destroyAllWindows()
+    output_video_path = "output/decrypted_output_video.avi"
+
+    # Define the codec and create a VideoWriter object
+    fourcc = cv2.VideoWriter_fourcc(*'FFV1')   # Codec (use 'XVID', 'mp4v', 'MJPG', etc.)
+    frame_size = (width, height)  # Frame size (width, height) - should match frame size of RGB frames
+    # print(frame_size)
+    out = cv2.VideoWriter(output_video_path, fourcc, fps, frame_size)
+
+    # Loop through each frame in the array and write it to the video
+    # print(cipherFrames[0])
+    for frame in np.array(videoFrames):
+        out.write(frame)  # Write each frame
+
+
+    # Release the VideoWriter object
+    out.release()
+    print("Done Decrypting")
+    playVideo("output/decrypted_output_video.avi")
+    # exit()
 
 # function to reset the video to original video and show preview of that
 def reset_fun():

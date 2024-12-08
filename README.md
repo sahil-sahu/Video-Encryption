@@ -1,103 +1,44 @@
-## ✔ VIDEO ENCRYPTION DECRYPTION
-- An Video Encryption Decryption is an application created in python with tkinter gui and OpenCv library.
-- In this application user can select any video (either mpy, mkv, avi, or any other extension of video) and will be able to encrypt, decrypt and reset the encrypted video to original format.
--  Along with encryption, decryption, user will also be able to see the preview of encrypted, decrypted and original video.
+# Video Encryption and Decryption with RSA and AES
 
-<p align = "center">
-	<img src = "https://img.shields.io/github/stars/akash-rajak/Video-Encryption-Decryption?style=social", alt = "GitHub Repo stars">
-	<img src = "https://img.shields.io/github/forks/akash-rajak/Video-Encryption-Decryption?style=social", alt = "GitHub Repo forks">
-	<img src = "https://img.shields.io/github/watchers/akash-rajak/Video-Encryption-Decryption?style=social", alt = "GitHub Repo watchers">
-	<img src = "https://img.shields.io/github/contributors/akash-rajak/Video-Encryption-Decryption?style=social", alt = "GitHub contributors">
-</p>
-<p align = "center">
-	<img src = "https://img.shields.io/github/languages/count/akash-rajak/Video-Encryption-Decryption?style=social", alt = "GitHub language count">
-	<img src = "https://img.shields.io/github/languages/top/akash-rajak/Video-Encryption-Decryption?style=social", alt = "GitHub top language">
-	<img src = "https://img.shields.io/github/directory-file-count/akash-rajak/Video-Encryption-Decryption?style=social", alt = "GitHub repo file count">
-	<img src = "https://img.shields.io/github/repo-size/akash-rajak/Video-Encryption-Decryption?style=social", alt = "GitHub repo size">
-</p>
-<p align = "center">
-	<img src = "https://img.shields.io/github/issues/akash-rajak/Video-Encryption-Decryption", alt = "GitHub issues">
-	<img src = "https://img.shields.io/github/issues-closed/akash-rajak/Video-Encryption-Decryption", alt = "GitHub closed issues">
-	<img src = "https://img.shields.io/github/issues-pr/akash-rajak/Video-Encryption-Decryption", alt = "GitHub pull requests">
-	<img src = "https://img.shields.io/github/issues-pr-closed/akash-rajak/Video-Encryption-Decryption", alt = "GitHub closed pull requests">
-</p>
-<p align = "center">
-	<img src = "https://img.shields.io/github/commit-activity/t/akash-rajak/Video-Encryption-Decryption", alt = "GitHub commit activity">
-	<img src = "https://img.shields.io/github/commit-activity/y/akash-rajak/Video-Encryption-Decryption", alt = "GitHub commit activity/year">
-	<img src = "https://img.shields.io/github/commit-activity/m/akash-rajak/Video-Encryption-Decryption", alt = "GitHub commit activity/month">
-	<img src = "https://img.shields.io/github/commit-activity/w/akash-rajak/Video-Encryption-Decryption", alt = "GitHub commit activity/week">
-	<img src = "https://img.shields.io/github/last-commit/akash-rajak/Video-Encryption-Decryption", alt = "GitHub last commit">
-	<img src = "https://img.shields.io/github/discussions/akash-rajak/Video-Encryption-Decryption", alt = "GitHub Discussions">
-</p>
-<p align = "center">
-	<img src = "https://img.shields.io/github/license/akash-rajak/Video-Encryption-Decryption", alt = "Github">
-</p>
+**Description**
 
-****
+This project implements a video encryption and decryption system using the RSA and AES algorithms. It encrypts videos frame-by-frame, ensuring strong security for your video content.
 
-### 📌REQUIREMENTS :
-- python 3
-- tkinter module
-- filedialog from tkinter
-- messagebox
-- from PIL import Image, ImageTk
-- cv2
-- numpy
-- os
-- random
-- moviepy
+**Features**
 
-****
+* Securely encrypts videos using a combination of RSA and AES for key exchange and data encryption.
+* Decrypts encrypted videos with the corresponding private key.
+* Provides user-friendly controls for selecting videos, performing encryption/decryption, and viewing the original/encrypted video.
 
-### 📌HOW TO Use it :
-- User just need to download the file, and run the video_encryption_decryption.py, on local system.
-- After running a GUI window appears, where user can start the video encryption decryption application by clicking on the START button.
-- After that a new GUI window will open, in which user will have buttons like SELECT, ENCRYPT VIDEO, DECRYPT VIDEO, RESET and EXIT.
-- User can select any video file (either mpy, mkv, avi, or any other extension of video) from the local system, using SELECT button.
-- After user has selected video, user will be able to see the path of the video selected in the text area.
-- After this, when user clicks on the ENCRYPT VIDEO button, the encryption process will start and user will be shown an encrypted video as a preview.
-- After that user can decrypt the encrypted video, using DECRYPT VIDEO which will show decrypted video as a preview.
-- Also there is a RESET button, clicking on which user can reset the video to original format, which will show the preview for the same.
-- Also there is an EXIT button clicking opn which user can exit from the application.
 
-### 📌Purpose :
-- This scripts helps user to easily to encrypt, decrypt or reset to original format by selecting any video from local system.
+**Installation**
 
-### 📌Compilation Steps :
-- Install tkinter, PIL, cv2, numpy, os, random, moviepy
-- After that download the code file, and run video_encryption_decryption.py on local system.
-- Then the script will start running and user can explore selecting any video and encrypting and decrypting it and seeing the preview for the same.
+1. Clone this repository or download the code files.
+2. Install the required libraries using `pip install -r requirements.txt`.
 
-****
+**Usage**
 
-### 📌SCREENSHOTS :
+1. Run the script `video_encryption_decryption.py`.
+2. The graphical user interface (GUI) will display options for selecting a video, choosing encryption or decryption, and viewing the original/encrypted video.
+3. Select the desired video file and click the appropriate button ("ENCRYPT VIDEO" or "DECRYPT VIDEO").
+4. If decrypting, you might be prompted to enter the encrypted key (obtained during encryption).
+5. The encrypted/decrypted video will be saved in the `output` directory.
 
-<p align="center">
-  <img width = 1000 src="Images/1.jpg" /><br>
-  <img width = 1000 src="Images/2.jpg" /><br>
-  <img width = 1000 src="Images/3.jpg" /><br>
-  <img width = 1000 src="Images/4.jpg" /><br>
-  <img width = 1000 src="Images/5.jpg" /><br>
-  <img width = 1000 src="Images/6.jpg" /><br>
-  <img width = 1000 src="Images/7.jpg" /><br>
-  <img width = 1000 src="Images/8.jpg" /><br>
-  <img width = 1000 src="Images/9.jpg" /><br>
-</p>
+**Notes**
 
-****
+* This project uses RSA key pairs (`rsa_private_key.pem` and `rsa_public_key.pem`) for encryption and decryption. These keys are automatically generated if they don't exist and are stored securely.
+* The encrypted video will be larger than the original video due to the additional encryption overhead.
 
-### 🌟Stargazers Over Time:
-[![Stargazers repo roster for @akash-rajak/Video-Encryption-Decryption](https://reporoster.com/stars/akash-rajak/Video-Encryption-Decryption)](https://github.com/akash-rajak/Video-Encryption-Decryption/stargazers)
-[![Stargazers over time](https://starchart.cc/akash-rajak/Video-Encryption-Decryption.svg)](https://starchart.cc/akash-rajak/Video-Encryption-Decryption)
+**Code Structure**
 
-****
+The code is organized into the following modules:
 
-### 🌟Forkers Over Time:
-[![Forkers repo roster for @akash-rajak/Video-Encryption-Decryption](https://reporoster.com/forks/akash-rajak/Video-Encryption-Decryption)](https://github.com/akash-rajak/Video-Encryption-Decryption/network/members)
+* `video_encryption_decryption.py`: The main script that launches the GUI and handles user interactions.
+* `encryption.py`: Contains functions for RSA key generation, key encryption/decryption, and AES key generation.
+* `formating.py`: Provides functions for converting video frames to text and vice versa.
 
-****
+**Future Enhancements**
 
-### 📌Contributors:
-<a href="https://github.com/akash-rajak/Video-Encryption-Decryption/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=akash-rajak/Video-Encryption-Decryption" />
-</a>
+* Implement progress bars during encryption and decryption for better user feedback.
+* Allow users to specify custom output filenames.
+* Consider adding support for video formats beyond AVI.
