@@ -13,7 +13,7 @@ This project implements a video encryption and decryption system using the RSA a
 
 **Installation**
 
-1. Clone this repository or download the code files.
+1. Clone this repository and download the code files.
 2. Install the required libraries using `pip install -r requirements.txt`.
 
 **Usage**
